@@ -35,127 +35,139 @@
 			</div>
 		</div>
 	</header>
-	<div id="weather" v-if="weatherShow">
-		<span class="city-name">
-			{{ weatherData.name }}, {{ weatherData.sys.country }}
-		</span>
-		<h1 class="temperature">{{ Math.round(weatherData.main.temp) }}°</h1>
+	<main id="weather">
+		<div class="weather-real" v-if="weatherShow">
+			<span class="city-name">
+				{{ weatherData.name }}, {{ weatherData.sys.country }}
+			</span>
+			<h1 class="temperature">{{ Math.round(weatherData.main.temp) }}°</h1>
 
-		<span class="weather-info">
-			{{ weatherData.weather[0].description }}
-		</span>
+			<span class="weather-info">
+				{{ weatherData.weather[0].description }}
+			</span>
 
-		<span class="temperature-info">
-			мин. {{ Math.round(weatherData.main.temp) }}° макс.
-			{{ Math.round(weatherData.main.temp) }}°
-		</span>
+			<span class="temperature-info">
+				мин. {{ Math.round(weatherData.main.temp) }}° макс.
+				{{ Math.round(weatherData.main.temp) }}°
+			</span>
 
-		<div class="weather">
-			<!-- Температура ощущается как -->
-			<div class="weather-block">
-				<div class="desc-block">
-					<span class="text-desc">
-						<img src="/icons/temperature.svg" alt="temperature" height="14" />
-						Ощущается как
-					</span>
-					<span class="heavy-text">
-						{{ Math.round(weatherData.main.feels_like) }}°
+			<div class="weather">
+				<!-- Температура ощущается как -->
+				<div class="weather-block">
+					<div class="desc-block">
+						<span class="text-desc">
+							<img src="/icons/temperature.svg" alt="temperature" height="14" />
+							Ощущается как
+						</span>
+						<span class="heavy-text">
+							{{ Math.round(weatherData.main.feels_like) }}°
+						</span>
+					</div>
+					<span class="text-desc item">
+						{{
+							getFeelsTemperature(
+								weatherData.main.feels_like,
+								weatherData.main.temp
+							)
+						}}
 					</span>
 				</div>
-				<span class="text-desc item">
-					{{
-						getFeelsTemperature(
-							weatherData.main.feels_like,
-							weatherData.main.temp
-						)
-					}}
-				</span>
-			</div>
 
-			<div class="weather-block">
-				<div class="desc-block">
-					<span class="text-desc">
-						<img src="/icons/wind.svg" alt="temperature" height="14" />
-						Ветер
+				<div class="weather-block">
+					<div class="desc-block">
+						<span class="text-desc">
+							<img src="/icons/wind.svg" alt="temperature" height="14" />
+							Ветер
+						</span>
+						<span class="heavy-text">
+							{{ Math.round(weatherData.wind.speed) }}
+							<span style="font-size: 16px">м/с</span>
+						</span>
+					</div>
+					<span class="text-desc item" v-if="weatherData.wind.gust"
+						>Порывы до <br />
+						<span style="color: #fff">
+							{{ Math.round(weatherData.wind.gust) }} м/с
+						</span>
 					</span>
-					<span class="heavy-text">
-						{{ Math.round(weatherData.wind.speed) }}
-						<span style="font-size: 16px">м/с</span>
+
+					<span class="text-desc item" v-else
+						>Данных о порывах ветра не поступало</span
+					>
+				</div>
+
+				<div class="weather-block">
+					<div class="desc-block">
+						<span class="text-desc">
+							<img src="/icons/eye.svg" alt="temperature" height="14" />
+							Видимость
+						</span>
+						<span class="heavy-text">
+							{{ (weatherData.visibility / 1000).toFixed(1) }}
+							<span style="color: #fff; font-size: 16px">км.</span>
+						</span>
+					</div>
+					<span class="text-desc item">
+						{{ getVisibilityDesc(weatherData.visibility) }}
 					</span>
 				</div>
-				<span class="text-desc item" v-if="weatherData.wind.gust"
-					>Порывы до <br />
-					<span style="color: #fff">
-						{{ Math.round(weatherData.wind.gust) }} м/с
-					</span>
-				</span>
 
-				<span class="text-desc item" v-else
-					>Данных о порывах ветра не поступало</span
-				>
-			</div>
-
-			<div class="weather-block">
-				<div class="desc-block">
-					<span class="text-desc">
-						<img src="/icons/eye.svg" alt="temperature" height="14" />
-						Видимость
-					</span>
-					<span class="heavy-text">
-						{{ (weatherData.visibility / 1000).toFixed(1) }}
-						<span style="color: #fff; font-size: 16px">км.</span>
+				<div class="weather-block">
+					<div class="desc-block">
+						<span class="text-desc">
+							<img src="/icons/sunrise.svg" alt="temperature" height="14" />
+							{{ getSunTimeDesc(1).description }}
+						</span>
+						<span class="heavy-text">
+							{{ formatTime(weatherData.sys.sunrise) }}
+						</span>
+					</div>
+					<span class="text-desc item">
+						{{ getSunTimeDesc().description }}<br />
+						{{ getCurrentSun() }}
 					</span>
 				</div>
-				<span class="text-desc item">
-					{{ getVisibilityDesc(weatherData.visibility) }}
-				</span>
-			</div>
+				<div class="weather-block">
+					<div class="desc-block">
+						<span class="text-desc">
+							<img src="/icons/humidity.svg" alt="temperature" height="14" />
+							Влажность
+						</span>
+						<span class="heavy-text"> {{ weatherData.main.humidity }} % </span>
+					</div>
+					<span class="text-desc item">
+						{{ getHumidityDesc() }}
+					</span>
+				</div>
 
-			<div class="weather-block">
-				<div class="desc-block">
-					<span class="text-desc">
-						<img src="/icons/sunrise.svg" alt="temperature" height="14" />
-						{{ getSunTimeDesc(1).description }}
-					</span>
-					<span class="heavy-text">
-						{{ formatTime(weatherData.sys.sunrise) }}
-					</span>
-				</div>
-				<span class="text-desc item">
-					{{ getSunTimeDesc().description }}<br />
-					{{ getCurrentSun() }}
-				</span>
-			</div>
-			<div class="weather-block">
-				<div class="desc-block">
-					<span class="text-desc">
-						<img src="/icons/humidity.svg" alt="temperature" height="14" />
-						Влажность
-					</span>
-					<span class="heavy-text"> {{ weatherData.main.humidity }} % </span>
-				</div>
-				<span class="text-desc item">
-					{{ getHumidityDesc() }}
-				</span>
-			</div>
-
-			<div class="weather-block">
-				<div class="desc-block">
-					<span class="text-desc">
-						<img src="/icons/pressure.svg" alt="temperature" height="14" />
-						Давление
-					</span>
-					<span class="heavy-text">
-						{{ weatherData.main.pressure }}
-						<span style="font-size: 16px">гПа</span>
+				<div class="weather-block">
+					<div class="desc-block">
+						<span class="text-desc">
+							<img src="/icons/pressure.svg" alt="temperature" height="14" />
+							Давление
+						</span>
+						<span class="heavy-text">
+							{{ weatherData.main.pressure }}
+							<span style="font-size: 16px">гПа</span>
+						</span>
+					</div>
+					<span class="text-desc item">
+						{{ getPressureDesc() }}
 					</span>
 				</div>
-				<span class="text-desc item">
-					{{ getPressureDesc() }}
-				</span>
 			</div>
 		</div>
-	</div>
+		<div class="no-weather">
+			<h1>Выберите город для просмотра погоды</h1>
+			<h2>Например: Ростов-на-Дону</h2>
+		</div>
+	</main>
+	<footer>
+		<span class="footer-text">
+			Powered by
+			<a href="https://openweathermap.org/api" ref="noref">OpenWeather API</a>
+		</span>
+	</footer>
 </template>
 
 <script>
