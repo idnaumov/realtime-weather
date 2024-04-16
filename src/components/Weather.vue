@@ -11,8 +11,26 @@
 						placeholder="Введите свой город"
 						v-model="cityInput"
 						id="cityInput"
+						@input="getCitiesList"
 						@keypress.enter="getWeather"
 					/>
+
+					<ul class="city-list">
+						<li
+							class="city-item"
+							v-for="(item, index) in cities"
+							:index="index"
+							@click="getWeatherByName(item.name)"
+						>
+							<span class="city-name">
+								{{
+									item.local_names && item.local_names['ru']
+										? item.local_names['ru']
+										: item.name
+								}}, {{ item.country }}
+							</span>
+						</li>
+					</ul>
 				</label>
 			</div>
 		</div>
@@ -148,6 +166,7 @@ export default {
 		return {
 			cityInput: '',
 			weatherData: [],
+			cities: [],
 			weatherShow: false,
 		};
 	},
@@ -167,7 +186,41 @@ export default {
 			).then(response => {
 				this.weatherData = response['data'];
 				this.weatherShow = true;
-				console.log('this.weatherData', this.weatherData);
+			});
+		},
+
+		async getWeatherByName(name) {
+			if (!name) return;
+
+			await axios('https://api.openweathermap.org/data/2.5/weather?q=' + name, {
+				params: {
+					appid: '30edf1b6f565ec00ddd08901dff35571',
+					lang: 'ru',
+					units: 'metric',
+				},
+			}).then(response => {
+				this.weatherData = response['data'];
+				this.cities = [];
+				this.weatherShow = true;
+			});
+		},
+
+		async getCitiesList() {
+			if (!this.cityInput) return;
+
+			await axios(
+				'http://api.openweathermap.org/geo/1.0/direct?q=' + this.cityInput,
+				{
+					params: {
+						appid: '30edf1b6f565ec00ddd08901dff35571',
+						limit: 5,
+					},
+				}
+			).then(response => {
+				this.cities = response['data'];
+				// this.weatherData = response['data'];
+				// this.weatherShow = true;
+				console.log('this.cities', this.cities);
 			});
 		},
 
@@ -246,9 +299,6 @@ export default {
 
 		getCurrentSun() {
 			const date = new Date();
-			console.log(
-				Math.round(date.getTime() / 1000) + this.weatherData.timezone
-			);
 
 			const currentTimezoneOffsetInSeconds =
 				-new Date().getTimezoneOffset() * 60;
