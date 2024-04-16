@@ -209,7 +209,7 @@ export default {
 			if (!this.cityInput) return;
 
 			await axios(
-				'http://api.openweathermap.org/geo/1.0/direct?q=' + this.cityInput,
+				'https://api.openweathermap.org/geo/1.0/direct?q=' + this.cityInput,
 				{
 					params: {
 						appid: '30edf1b6f565ec00ddd08901dff35571',
